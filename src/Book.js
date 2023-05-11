@@ -18,8 +18,8 @@ class Book extends React.Component {
           <InputBase
             inputProps={{"aria-label": "naked"}}
             type="text"
-            id={item.id}
-            name={item.id}
+            id={item.id} // 각 리스트를 구분하려고 id를 연결(나중에 백엔드에서 대체)
+            name={item.id} // 각 리스트를 구분하려고 id를 연결
             value={item.title}
             
             multiline={true}

@@ -2,18 +2,29 @@ import React from 'react';
 import Book from './Book';
 import AddBook from './AddBook';
 import BookRows from './BookRows';
+import BookAdd from './BookAdd';
 import { Paper, List, Container } from "@material-ui/core";
 import './App.css';
+import BookDelete from './BookDelete';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [
-        { id: "0", title: "title1", author: "author1", publisher: "publisher1"},
-        { id: "1", title: "title2", author: "author2", publisher: "publisher2"}
+        { id: "0", title: "title1", author: "author1", publisher: "publisher1", userId: "user1"},
+        { id: "1", title: "title2", author: "author2", publisher: "publisher2", userId: "user1"},
+        { id: "2", title: "title3", author: "author3", publisher: "publisher3", userId: "user1"},
+
       ],
     };
+  }
+  add = (item) => {
+    const thisItems = this.state.items;
+    item.id = "ID-" + thisItems.length; // key를 위한 id 추가
+    thisItems.push(item); // 리스트에 아이템 추가
+    this.setState({ items: thisItems }); // 업데이트
+    console.log("add after items : ", this.state.items);
   }
   
   delete = (item) => {
@@ -64,6 +75,7 @@ class App extends React.Component {
                   <th>title</th>
                   <th>author</th>
                   <th>publisher</th>
+                  <th>userId</th>
                   <th>삭제버튼</th>
                 </tr>
               </thead>
@@ -73,6 +85,12 @@ class App extends React.Component {
             </table>
             
           </div>
+        </Container>
+        <Container> {/* 제품 정보 추가 UI 구현 */}
+          <BookAdd add={this.add} />
+        </Container>
+        <Container>
+          <BookDelete />
         </Container>
       </div>
     );
