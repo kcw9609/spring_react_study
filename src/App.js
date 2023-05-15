@@ -6,6 +6,8 @@ import BookAdd from './BookAdd';
 import { Paper, List, Container } from "@material-ui/core";
 import './App.css';
 import BookDelete from './BookDelete';
+import BookRetrieve from './BookRetrieve';
+import BookUpdate from './BookUpdate';
 
 class App extends React.Component {
   constructor(props) {
@@ -17,7 +19,9 @@ class App extends React.Component {
         { id: "2", title: "title3", author: "author3", publisher: "publisher3", userId: "user1"},
 
       ],
+      searchResult: {},
     };
+
   }
   add = (item) => {
     const thisItems = this.state.items;
@@ -36,6 +40,31 @@ class App extends React.Component {
       console.log("delete after items: ", this.state.items)
     });
   }
+  deleteFromTitle = (item) => {
+    const thisItems = this.state.items;
+    console.log("before delete item from title: ", this.state.items)
+    const newItems = thisItems.filter( e => e.title !== item.title);
+    this.setState({ items: newItems }, () => {
+      // 디버깅 콜백 나중에 구현
+      console.log("delete from title after items: ", this.state.items)
+    });
+  }
+
+  retrieve = (item) => {
+    const thisItems = this.state.items; // 가져와서
+    // const newItem = thisItems.filter( e => e.title === item.title ); // title이 같은 item만 담음
+    const newItem = thisItems.find(e => e.title === item.title);
+    this.setState({ searchResult: newItem }, () => {
+      console.log("retrieve item: ", newItem);
+      console.log(newItem.title + newItem.author);
+      console.log("retrieve from title(perant state): ", this.state.searchResult);
+    });
+  }
+  update = (item) => {
+    // 업데이트 하기
+
+  }
+
   render() {
     var BookItems =this.state.items.length > 0 &&(
       <Paper style={{margin: 16}}>
@@ -90,7 +119,13 @@ class App extends React.Component {
           <BookAdd add={this.add} />
         </Container>
         <Container>
-          <BookDelete />
+          <BookDelete deleteFromTitle={this.deleteFromTitle} />
+        </Container>
+        <Container>
+          <BookRetrieve retrieve={this.retrieve} searchResult={this.state.searchResult} />
+        </Container>
+        <Container>
+        <BookUpdate retrieve={this.retrieve} searchResult={this.state.searchResult} />
         </Container>
       </div>
     );

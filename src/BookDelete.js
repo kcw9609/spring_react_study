@@ -5,10 +5,13 @@ class BookDelete extends React.Component { //1. title 입력받고 2. 검색요�
   constructor(props) {
     super(props)
      this.state = { item: { title: "" }}; //사용자의 입력을 저장할 오브젝트
+     this.deleteFromTitle = props.deleteFromTitle;
   }
   onButtonClick = () => {
     // 검색
     // 삭제
+    console.log("after click: "+ this.state.item.title);
+    this.deleteFromTitle(this.state.item);
     this.setState({ item: { title: "" } }); // 추가 후 state객체 초기화
   }
 
@@ -27,7 +30,7 @@ class BookDelete extends React.Component { //1. title 입력받고 2. 검색요�
             <TextField placeholder="delete here" value={this.state.item.title} onChange={this.onInputChange} /> 
           </Grid>
           <Grid xs={4} md={4} item> 
-            <Button fullWidth color ="secondary" variant="outlined" onClick={this.onInputChange}>제품 삭제</Button> 
+            <Button fullWidth color ="secondary" variant="outlined" onClick={this.onButtonClick}>제품 삭제</Button> 
           </Grid>
         </Grid>
       </Paper>
