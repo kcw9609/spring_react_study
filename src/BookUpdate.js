@@ -9,6 +9,7 @@ class BookUpdate extends React.Component {
       updateItem: { id: "", title: "", author: "", publisher: "", userId: "" },
     };
     this.retrieve = props.retrieve;
+    this.update = props.update;
   }
 
   onButtonClick = () => {
@@ -19,6 +20,7 @@ class BookUpdate extends React.Component {
   onUpdateButtonClick = () => {
     
     console.log("updated after click button: ", this.state.updateItem );
+    this.update(this.state.updateItem); // 추가 0516
   }
 
   onInputChange = (e) => {

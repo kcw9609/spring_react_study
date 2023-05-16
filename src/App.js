@@ -8,60 +8,104 @@ import './App.css';
 import BookDelete from './BookDelete';
 import BookRetrieve from './BookRetrieve';
 import BookUpdate from './BookUpdate';
+import { call } from "./service/ApiService";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [
-        { id: "0", title: "title1", author: "author1", publisher: "publisher1", userId: "user1"},
-        { id: "1", title: "title2", author: "author2", publisher: "publisher2", userId: "user1"},
-        { id: "2", title: "title3", author: "author3", publisher: "publisher3", userId: "user1"},
+        // { id: "0", title: "title1", author: "author1", publisher: "publisher1", userId: "user1"},
+        // { id: "1", title: "title2", author: "author2", publisher: "publisher2", userId: "user1"},
+        // { id: "2", title: "title3", author: "author3", publisher: "publisher3", userId: "user1"},
 
       ],
       searchResult: {},
     };
 
   }
-  add = (item) => {
-    const thisItems = this.state.items;
-    item.id = "ID-" + thisItems.length; // key를 위한 id 추가
-    thisItems.push(item); // 리스트에 아이템 추가
-    this.setState({ items: thisItems }); // 업데이트
-    console.log("add after items : ", this.state.items);
+  componentDidMount() { // 작동 ok
+    call("/book", "GET", null).then((response) =>
+      this.setState({ items: response.data }) // 로딩이 완료되었다는 표시
+    );
   }
+
+  add = (item) => { // 작동 ok
+    call("/book", "POST", item).then((response) =>
+      this.setState({ items: response.data })
+    );
+  };
+
+  delete = (item) => {  // 작동 ok
+    call("/book", "DELETE", item).then((response) =>
+      this.setState({ items: response.data })
+    );
+  };
+
+  // add = (item) => {
+  //   const thisItems = this.state.items;
+  //   item.id = "ID-" + thisItems.length; // key를 위한 id 추가
+  //   thisItems.push(item); // 리스트에 아이템 추가
+  //   this.setState({ items: thisItems }); // 업데이트
+  //   console.log("add after items : ", this.state.items);
+  // }
   
-  delete = (item) => {
-    const thisItems = this.state.items;
-    console.log("delete item: ", this.state.items)
-    const newItems = thisItems.filter( e => e.id !== item.id);
-    this.setState({ items: newItems }, () => {
-      // 디버깅 콜백 나중에 구현
-      console.log("delete after items: ", this.state.items)
-    });
-  }
-  deleteFromTitle = (item) => {
-    const thisItems = this.state.items;
-    console.log("before delete item from title: ", this.state.items)
-    const newItems = thisItems.filter( e => e.title !== item.title);
-    this.setState({ items: newItems }, () => {
-      // 디버깅 콜백 나중에 구현
-      console.log("delete from title after items: ", this.state.items)
+  // delete = (item) => {
+  //   const thisItems = this.state.items;
+  //   console.log("delete item: ", this.state.items)
+  //   const newItems = thisItems.filter( e => e.id !== item.id);
+  //   this.setState({ items: newItems }, () => {
+  //     // 디버깅 콜백 나중에 구현
+  //     console.log("delete after items: ", this.state.items)
+  //   });
+  // }
+  deleteFromTitle = (item) => { // title하나만 들어있음. ok
+    // const thisItems = this.state.items;
+    // console.log("before delete item from title: ", this.state.items)
+    // const newItems = thisItems.filter( e => e.title !== item.title);
+    // const deleteItem = thisItems.filter( e => e.title === item.title); // retrieve메소드로 가져와야함
+    // // call("/book", "DELETE", deleteItem).then((response) =>
+    // //   this.setState({ items: response.data })
+    // // );
+    call(`/book/${item.title}`, "GET")
+    .then((response) => {
+      const deleteItem = response.data[0]; // 배열을 객체로 변환
+      return call("/book", "DELETE", deleteItem);
+    })
+    .then((response) => {
+      this.setState({ items: response.data });
     });
   }
 
   retrieve = (item) => {
-    const thisItems = this.state.items; // 가져와서
-    // const newItem = thisItems.filter( e => e.title === item.title ); // title이 같은 item만 담음
-    const newItem = thisItems.find(e => e.title === item.title);
-    this.setState({ searchResult: newItem }, () => {
-      console.log("retrieve item: ", newItem);
-      console.log(newItem.title + newItem.author);
-      console.log("retrieve from title(perant state): ", this.state.searchResult);
+    // const thisItems = this.state.items; // 가져와서
+    // // const newItem = thisItems.filter( e => e.title === item.title ); // title이 같은 item만 담음
+    // const newItem = thisItems.find(e => e.title === item.title);
+    // this.setState({ searchResult: newItem }, () => {
+    //   console.log("retrieve item: ", newItem);
+    //   console.log(newItem.title + newItem.author);
+    //   console.log("retrieve from title(perant state): ", this.state.searchResult);
+    // });
+
+    // const retrieveTitle = item.title;
+    // const queryParams = new URLSearchParams(retrieveTitle).toString();
+    // call(`/book?${queryParams}`, "GET").then((response) =>
+    //   this.setState({ searchResult: response.data })
+    // );
+    const title = item.title;
+    call(`/book/${title}`, "GET").then((response) => {
+      this.setState({ searchResult: response.data[0] }); // 받은 데이터가 배열=>하나를 추출
+      console.log("set searchResult: ", this.state.searchResult)
     });
+
+    
   }
-  update = (item) => {
+  
+  update = (item) => { // ok 문제점: 새로고침해야 테이블에 업데이트가 됨
     // 업데이트 하기
+    call("/book", "PUT", item).then((response) =>
+      this.setState({ items: response.data })
+    );
 
   }
 
@@ -125,7 +169,7 @@ class App extends React.Component {
           <BookRetrieve retrieve={this.retrieve} searchResult={this.state.searchResult} />
         </Container>
         <Container>
-        <BookUpdate retrieve={this.retrieve} searchResult={this.state.searchResult} />
+        <BookUpdate retrieve={this.retrieve} searchResult={this.state.searchResult} update={this.update} />
         </Container>
       </div>
     );

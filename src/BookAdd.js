@@ -9,6 +9,7 @@ class BookAdd extends React.Component {
   }
   onButtonClick = () => {
     this.add(this.state.item);
+    console.log("added item: ", this.state.item)
     this.setState({ item: { title: "", author: "", publisher: "", userId: "" } }); // 추가 후 state객체 초기화
   }
   // 함수 작성
