@@ -10,6 +10,10 @@ import BookRetrieve from './BookRetrieve';
 import BookUpdate from './BookUpdate';
 import { call, signout } from "./service/ApiService";
 
+import Box from '@mui/material/Box';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -20,6 +24,7 @@ class App extends React.Component {
         // { id: "2", title: "title3", author: "author3", publisher: "publisher3", userId: "user1"},
 
       ],
+      selectedTabValue: 0,
       loading: true, // 로딩 중이라는 상태를 표현
       searchResult: {}, // BookRetireve클래스에서 사용
       searchResultForUpdate: {}, // BookUpdate클래스에서 사용
@@ -44,31 +49,9 @@ class App extends React.Component {
     );
   };
 
-  // add = (item) => {
-  //   const thisItems = this.state.items;
-  //   item.id = "ID-" + thisItems.length; // key를 위한 id 추가
-  //   thisItems.push(item); // 리스트에 아이템 추가
-  //   this.setState({ items: thisItems }); // 업데이트
-  //   console.log("add after items : ", this.state.items);
-  // }
-  
-  // delete = (item) => {
-  //   const thisItems = this.state.items;
-  //   console.log("delete item: ", this.state.items)
-  //   const newItems = thisItems.filter( e => e.id !== item.id);
-  //   this.setState({ items: newItems }, () => {
-  //     // 디버깅 콜백 나중에 구현
-  //     console.log("delete after items: ", this.state.items)
-  //   });
-  // }
+
   deleteFromTitle = (item) => { // title하나만 들어있음. ok
-    // const thisItems = this.state.items;
-    // console.log("before delete item from title: ", this.state.items)
-    // const newItems = thisItems.filter( e => e.title !== item.title);
-    // const deleteItem = thisItems.filter( e => e.title === item.title); // retrieve메소드로 가져와야함
-    // // call("/book", "DELETE", deleteItem).then((response) =>
-    // //   this.setState({ items: response.data })
-    // // );
+
     call(`/book/${item.title}`, "GET")
     .then((response) => {
       const deleteItem = response.data[0]; // 배열을 객체로 변환
@@ -105,9 +88,23 @@ class App extends React.Component {
     );
 
   }
+ 
+/*
+  CenteredTabs = () => {
+    const [value, setValue] = React.useState(0);
+  
+    const handleChange = (event, newValue) => {
+      setValue(newValue);
+    };
+  }
+*/
+  tabsChanged = (event, selectedTabValue) => { // 인덱스 값을 받아옴
+    // tab번호 설정
+    this.setState({ selectedTabValue : selectedTabValue });
+  };
 
   render() {
-    console.log("searchResultForUpdate:", this.state.searchResultForUpdate);
+    // console.log("searchResultForUpdate:", this.state.searchResultForUpdate);
     var BookItems =this.state.items.length > 0 &&( // 리스트: 기존 코드
       <Paper style={{margin: 16}}>
         <List>
@@ -144,16 +141,13 @@ class App extends React.Component {
       </AppBar>
     )
 
-
-    return (
-      <div className="App">
-        {navigationBar}{/**내비게이션 바 렌더링 */}
-        <Container id="1" maxWidth="md">
+    var addBook = (<Container id="1" maxWidth="md">
           <AddBook />
           <div className="BookList">{BookItems}</div>
 
-        </Container>
-        <Container id="2">
+        </Container>)
+    var booktable = (
+      <Container id="2">
           <div className="booktable">
             <table border="1px">
             <caption>Book item table</caption>
@@ -174,18 +168,45 @@ class App extends React.Component {
             
           </div>
         </Container>
-        <Container id="3"> {/* 제품 정보 추가 UI 구현 */}
+    )
+    var bookadd = (
+      <Container id="3"> {/* 제품 정보 추가 UI 구현 */}
           <BookAdd add={this.add} />
         </Container>
-        <Container id="4">
+    )
+    var bookdelete = (
+      <Container id="4">
           <BookDelete deleteFromTitle={this.deleteFromTitle} />
         </Container>
-        <Container id="5">
+    )
+    var bookretrieve = (
+      <Container id="5">
           <BookRetrieve retrieve={this.retrieve} searchResult={this.state.searchResult} />
         </Container>
-        <Container id="6">
+    )
+    var bookupdate = (
+      <Container id="6">
         <BookUpdate retrieveForUpdate={this.retrieveForUpdate} searchResultForUpdate={this.state.searchResultForUpdate} update={this.update} />
         </Container>
+    )
+
+    
+    return (
+      <div className="App">
+        {navigationBar}{/**내비게이션 바 렌더링 */}
+        <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
+          <Tabs centered onChange={this.tabsChanged}>
+            <Tab value = {1} label="Add" />
+            <Tab value = {2} label="Delete" />
+            <Tab value = {3} label="Retrieve " />
+            <Tab value = {4} label="Update" />
+          </Tabs>
+        </Box>
+        {this.state.selectedTabValue === 1 && bookadd}
+        {this.state.selectedTabValue === 2 && bookdelete}
+        {this.state.selectedTabValue === 3 && bookretrieve}
+        {this.state.selectedTabValue === 4 && bookupdate}
+        {booktable}{/**테이블 */}
       </div>
     );
   }

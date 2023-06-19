@@ -40,6 +40,7 @@ class BookUpdate extends React.Component {
       const { searchResultForUpdate } = this.props;
       this.setState({ // null값일 시 초기값 설정
         updateItem: {
+          
           id: searchResultForUpdate.id || "",
           title: searchResultForUpdate.title || "",
           author: searchResultForUpdate.author || "",
@@ -49,6 +50,8 @@ class BookUpdate extends React.Component {
       });
     }
   }
+
+
 
   render() {
     const { item, updateItem } = this.state;
@@ -120,7 +123,7 @@ class BookUpdate extends React.Component {
               제품 검색
             </Button>
           </Grid>
-          <Grid item xs={6} md={6}>
+          <Grid item xs={4} md={4}>
             <Button
               fullWidth
               color="secondary"
