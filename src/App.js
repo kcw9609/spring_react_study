@@ -3,12 +3,12 @@ import Book from './Book';
 import AddBook from './AddBook';
 import BookRows from './BookRows';
 import BookAdd from './BookAdd';
-import { Paper, List, Container } from "@material-ui/core";
+import { Paper, List, Container, AppBar, Toolbar, Typography, Grid, Button} from "@material-ui/core";
 import './App.css';
 import BookDelete from './BookDelete';
 import BookRetrieve from './BookRetrieve';
 import BookUpdate from './BookUpdate';
-import { call } from "./service/ApiService";
+import { call, signout } from "./service/ApiService";
 
 class App extends React.Component {
   constructor(props) {
@@ -20,13 +20,15 @@ class App extends React.Component {
         // { id: "2", title: "title3", author: "author3", publisher: "publisher3", userId: "user1"},
 
       ],
-      searchResult: {},
+      loading: true, // 로딩 중이라는 상태를 표현
+      searchResult: {}, // BookRetireve클래스에서 사용
+      searchResultForUpdate: {}, // BookUpdate클래스에서 사용
     };
 
   }
   componentDidMount() { // 작동 ok
     call("/book", "GET", null).then((response) =>
-      this.setState({ items: response.data }) // 로딩이 완료되었다는 표시
+      this.setState({ items: response.data, loading: false }) // 로딩이 완료되었다는 표시
     );
   }
 
@@ -78,24 +80,19 @@ class App extends React.Component {
   }
 
   retrieve = (item) => {
-    // const thisItems = this.state.items; // 가져와서
-    // // const newItem = thisItems.filter( e => e.title === item.title ); // title이 같은 item만 담음
-    // const newItem = thisItems.find(e => e.title === item.title);
-    // this.setState({ searchResult: newItem }, () => {
-    //   console.log("retrieve item: ", newItem);
-    //   console.log(newItem.title + newItem.author);
-    //   console.log("retrieve from title(perant state): ", this.state.searchResult);
-    // });
-
-    // const retrieveTitle = item.title;
-    // const queryParams = new URLSearchParams(retrieveTitle).toString();
-    // call(`/book?${queryParams}`, "GET").then((response) =>
-    //   this.setState({ searchResult: response.data })
-    // );
     const title = item.title;
     call(`/book/${title}`, "GET").then((response) => {
       this.setState({ searchResult: response.data[0] }); // 받은 데이터가 배열=>하나를 추출
       console.log("set searchResult: ", this.state.searchResult)
+    });
+
+    
+  }
+  retrieveForUpdate = (item) => {
+    const title = item.title;
+    call(`/book/${title}`, "GET").then((response) => {
+      this.setState({ searchResultForUpdate: response.data[0] }); // 받은 데이터가 배열=>하나를 추출
+      console.log("set searchResultForUpdate: ", this.state.searchResultForUpdate)
     });
 
     
@@ -110,7 +107,8 @@ class App extends React.Component {
   }
 
   render() {
-    var BookItems =this.state.items.length > 0 &&(
+    console.log("searchResultForUpdate:", this.state.searchResultForUpdate);
+    var BookItems =this.state.items.length > 0 &&( // 리스트: 기존 코드
       <Paper style={{margin: 16}}>
         <List>
           {this.state.items.map((item, idx) => (
@@ -121,26 +119,43 @@ class App extends React.Component {
     );
 
     var BookTables =this.state.items.length > 0 &&(
-      
       <tbody>
+        
       {this.state.items.map((item, idx) => (
-        <BookRows item={item} key={item.key} delete={this.delete} />
+        <BookRows item={item} key={item.id} delete={this.delete} />
       ))}
-</tbody> 
+      </tbody> 
     );
+    // navigationBar추가
+    var navigationBar = (
+      <AppBar position="static">
+        <Toolbar>
+          <Grid justify="space-between" container>
+            <Grid item>
+              <Typography variant="h6">도서 관리</Typography>
+            </Grid>
+            <Grid>
+              <Button color="inherit" onClick={signout}>
+                로그아웃
+              </Button>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar>
+    )
 
 
     return (
-      
       <div className="App">
-        <Container maxWidth="md">
+        {navigationBar}{/**내비게이션 바 렌더링 */}
+        <Container id="1" maxWidth="md">
           <AddBook />
           <div className="BookList">{BookItems}</div>
 
         </Container>
-        <Container>
+        <Container id="2">
           <div className="booktable">
-            <table>
+            <table border="1px">
             <caption>Book item table</caption>
               <thead>
                 <tr>
@@ -159,17 +174,17 @@ class App extends React.Component {
             
           </div>
         </Container>
-        <Container> {/* 제품 정보 추가 UI 구현 */}
+        <Container id="3"> {/* 제품 정보 추가 UI 구현 */}
           <BookAdd add={this.add} />
         </Container>
-        <Container>
+        <Container id="4">
           <BookDelete deleteFromTitle={this.deleteFromTitle} />
         </Container>
-        <Container>
+        <Container id="5">
           <BookRetrieve retrieve={this.retrieve} searchResult={this.state.searchResult} />
         </Container>
-        <Container>
-        <BookUpdate retrieve={this.retrieve} searchResult={this.state.searchResult} update={this.update} />
+        <Container id="6">
+        <BookUpdate retrieveForUpdate={this.retrieveForUpdate} searchResultForUpdate={this.state.searchResultForUpdate} update={this.update} />
         </Container>
       </div>
     );

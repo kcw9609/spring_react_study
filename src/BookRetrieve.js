@@ -17,8 +17,8 @@ class BookRetrieve extends React.Component {
 
   onInputChange = (e) => {
     const { value } = e.target;
-    this.setState((prevState) => ({
-      item: { ...prevState.item, title: value },
+    this.setState((prev) => ({ // 순서대로 실행
+      item: { ...prev.item, title: value }, // 복사하고 title지정
     }));
   };
 

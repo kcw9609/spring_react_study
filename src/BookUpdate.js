@@ -8,56 +8,51 @@ class BookUpdate extends React.Component {
       item: { title: "" },
       updateItem: { id: "", title: "", author: "", publisher: "", userId: "" },
     };
-    this.retrieve = props.retrieve;
+    this.retrieveForUpdate = props.retrieveForUpdate;
     this.update = props.update;
   }
 
   onButtonClick = () => {
     const { item } = this.state;
-    this.retrieve(item);
-    this.copy();
+    this.retrieveForUpdate(item);
   };
+
   onUpdateButtonClick = () => {
-    
-    console.log("updated after click button: ", this.state.updateItem );
-    this.update(this.state.updateItem); // 추가 0516
-  }
+    this.update(this.state.updateItem);
+  };
 
   onInputChange = (e) => {
     const { value } = e.target;
-    this.setState((prevState) => ({
-      item: { ...prevState.item, title: value },
+    this.setState((prev) => ({ // 순서대로
+      item: { ...prev.item, title: value }, // 깊은 복사 + title지정
     }));
-  };
-
-  copy = () => { // 복사
-    const { searchResult } = this.props;
-    const { updateItem } = this.state;
-
-    const id = searchResult.id;
-    const title = searchResult.title || "";
-    const author = searchResult.author || ""; // author가 없을 경우 빈 문자열로 설정
-    const publisher = searchResult.publisher || ""; // publisher가 없을 경우 빈 문자열로 설정
-    const userId = searchResult.userId || ""; // userId가 없을 경우 빈 문자열로 설정
-
-    updateItem.id = id;
-    updateItem.title = title;
-    updateItem.author = author;
-    updateItem.publisher = publisher;
-    updateItem.userId = userId;
-
-    this.setState({ updateItem: updateItem });
   };
 
   onInputChangeTextField = (e) => {
     const { id, value } = e.target;
-    this.setState((prevState) => ({
-      updateItem: { ...prevState.updateItem, [id]: value },
+    this.setState((prev) => ({
+      updateItem: { ...prev.updateItem, [id]: value }, // 복사 + 어떤 id의 값인지
     }));
   };
 
+  componentDidUpdate(prev) { // 컴포넌트가 업데이트된 직후에 실행되는 메소드(처음에는 안쓰임)
+    if (prev.searchResultForUpdate !== this.props.searchResultForUpdate) { // 이전의 값을 가져와 비교
+      const { searchResultForUpdate } = this.props;
+      this.setState({ // null값일 시 초기값 설정
+        updateItem: {
+          id: searchResultForUpdate.id || "",
+          title: searchResultForUpdate.title || "",
+          author: searchResultForUpdate.author || "",
+          publisher: searchResultForUpdate.publisher || "",
+          userId: searchResultForUpdate.userId || "",
+        },
+      });
+    }
+  }
+
   render() {
-    const { item, updateItem } = this.state; // 객체 복사
+    const { item, updateItem } = this.state;
+    const { searchResultForUpdate } = this.props;
 
     return (
       <Paper style={{ margin: 16, padding: 16 }}>
@@ -66,8 +61,8 @@ class BookUpdate extends React.Component {
             <label>title: </label>
           </Grid>
           <Grid xs={4} md={4} item style={{ paddingRight: 16 }}>
-            <TextField
-              id="title"
+            <TextField 
+              id="title" // 검색
               placeholder="add here"
               onChange={this.onInputChange}
               value={item.title}
@@ -136,8 +131,11 @@ class BookUpdate extends React.Component {
             </Button>
           </Grid>
         </Grid>
+        <div><h3>수정:</h3>
+          <pre>{JSON.stringify(this.state.updateItem, null, 3)}</pre>
+        </div>
         <div><h3>검색 결과:</h3>
-          <pre>{JSON.stringify(this.state.updateItem, null, 2)}</pre>
+          <pre>{JSON.stringify(searchResultForUpdate, null, 3)}</pre>
         </div>
       </Paper>
     );
@@ -145,5 +143,3 @@ class BookUpdate extends React.Component {
 }
 
 export default BookUpdate;
-
-
