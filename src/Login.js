@@ -8,6 +8,7 @@ class Login extends React.Component{
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this); // 추가
 
+
   }
   // 추가
   handleSubmit(event) {
@@ -16,7 +17,10 @@ class Login extends React.Component{
     const email = data.get("email");
     const password = data.get("password");
     // ApiService signin메소드 사용
+    
     signin({ email: email, password: password });
+
+
   }
 
   render(){ // 수정
