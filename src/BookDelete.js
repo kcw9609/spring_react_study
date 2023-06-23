@@ -10,9 +10,11 @@ class BookDelete extends React.Component { //1. title 입력받고 2. 검색요�
   onButtonClick = () => {
     // 검색
     // 삭제
+
     console.log("after click: "+ this.state.item.title);
     this.deleteFromTitle(this.state.item);
     this.setState({ item: { title: "" } }); // 추가 후 state객체 초기화
+
   }
 
   onInputChange = (e) => {

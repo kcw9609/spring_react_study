@@ -4,13 +4,13 @@ import { TextField, Paper, Button, Grid } from "@material-ui/core";
 class BookAdd extends React.Component {
     constructor(props) {
      super(props);
-     this.state = { item: { title: "", author: "", publisher: "", userId: "" }}; //사용자의 입력을 저장할 오브젝트
+     this.state = { item: { title: "", author: "", publisher: "", userId: "", url: "" }}; //사용자의 입력을 저장할 오브젝트
      this.add = props.add;
   }
   onButtonClick = () => {
     this.add(this.state.item);
     console.log("added item: ", this.state.item)
-    this.setState({ item: { title: "", author: "", publisher: "", userId: "" } }); // 추가 후 state객체 초기화
+    this.setState({ item: { title: "", author: "", publisher: "", userId: "", url: ""} }); // 추가 후 state객체 초기화
   }
   // 함수 작성
   onInputChange = (e) => {
@@ -28,6 +28,9 @@ class BookAdd extends React.Component {
     }
     if(changedTextFieldId === "userId"){
       thisItem.userId = e.target.value;
+    }
+    if(changedTextFieldId === "url"){
+      thisItem.url = e.target.value;
     }
     // thisItem.title = e.target.value;
     this.setState({ item: thisItem }); // 사용자가 key입력할 때마다 state객체 설정
@@ -60,10 +63,17 @@ class BookAdd extends React.Component {
           <Grid xs={4} md={4} item style={{paddingRight: 16}}>
              <TextField id="userId" placeholder="add here" onChange={this.onInputChange} value={this.state.item.userId} /> 
           </Grid>  
-          <Grid xs={4} md={4} item> 
+          
+        </Grid>
+        <Grid>
+          <Grid xs={4} md={4} item style={{paddingRight: 16}}> <label>url: </label> </Grid>
+          <Grid xs={4} md={4} item style={{paddingRight: 16}}> 
+            <TextField id="url" placeholder="add here" onChange={this.onInputChange} value={this.state.item.url} /> 
+          </Grid>  
+        </Grid>
+        <Grid xs={4} md={4} item> 
             <Button fullWidth color ="secondary" variant="outlined" onClick={this.onButtonClick}>제품 추가</Button> 
           </Grid>
-        </Grid>
       </Paper>
     return (
       addtable

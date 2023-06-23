@@ -18,7 +18,9 @@ class BookUpdate extends React.Component {
   };
 
   onUpdateButtonClick = () => {
-    this.update(this.state.updateItem);
+    const { updateItem } = this.state;
+    this.update(updateItem);
+      
   };
 
   onInputChange = (e) => {

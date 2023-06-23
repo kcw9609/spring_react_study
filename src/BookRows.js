@@ -1,6 +1,7 @@
 import { Table } from "@material-ui/core";
 import React from "react";
-import { TextField, Paper, Button, Grid } from "@material-ui/core";
+import { TextField, Paper, Button, Grid, Icon } from "@material-ui/core";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 
 
@@ -9,25 +10,30 @@ class BookRows extends React.Component {
     super(props);
     this.state={item :props.item };
     this.delete=props.delete;
-  }
 
-  deleteEventHandler = () => {
-    this.delete(this.state.item)
   }
+  handleClick = () => {
+    if(this.state.item.url){
+      window.open(this.state.item.url, "_blank"); 
+    }
+
+  };
 
   render() {
     const item = this.state.item;
-
 
     return (
       <tr key={item.id}>
           <td>{item.id}</td>
           <td>{item.title}</td>
-          <td>{item.author}</td>
+          <td>{this.state.item.author}</td>
           <td>{item.publisher}</td>
-          <td>{item.userId}</td>
-          <td><button onClick={this.deleteEventHandler}>delete</button></td>
+          <td>{item.userId}</td>{/**userid?username? */}
+          <td>
+            <button onClick={this.handleClick}><Icon component={LaunchIcon} /></button>
+          </td>   
       </tr>
+      
     )
 
 
