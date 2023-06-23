@@ -3,7 +3,7 @@ import Book from './Book';
 import AddBook from './AddBook';
 import BookRows from './BookRows';
 import BookAdd from './BookAdd';
-import { Paper, List, Container, AppBar, Toolbar, Typography, Grid, Button} from "@material-ui/core";
+import { Paper, List, Container, AppBar, Toolbar, Typography, Grid, Button, Modal } from "@material-ui/core";
 import './App.css';
 import BookDelete from './BookDelete';
 import BookRetrieve from './BookRetrieve';
@@ -13,6 +13,10 @@ import { call, signout } from "./service/ApiService";
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+import { deepOrange, deepPurple } from '@mui/material/colors';
 
 
 class App extends React.Component {
@@ -29,6 +33,8 @@ class App extends React.Component {
       loading: true, // 로딩 중이라는 상태를 표현
       searchResult: {}, // BookRetireve클래스에서 사용
       searchResultForUpdate: {}, // BookUpdate클래스에서 사용
+      isModalOpen: false,
+      //userInfo: {},
       
 
     };
@@ -39,6 +45,9 @@ class App extends React.Component {
       this.setState({ items: response.data, loading: false }) // 로딩이 완료되었다는 표시
     );
   }
+  
+  
+
 
   add = (item) => { // 작동 ok
     try{
@@ -74,6 +83,20 @@ class App extends React.Component {
 
     });
   }
+  // getUserInfo = () => { 
+  //   const userId = this.state.items[0].userId;
+  //   console.log("userId: "+userId); // console
+  //   call(`/book/user/${userId}`, "GET").then((response) =>{
+  //     if(response.data){
+  //       console.log("userId in fuction"+userId);
+  //       console.log("data in fuction"+response.data);
+  //     //this.setState({ userInfo: response.data });
+  //     }else{alert("no userdata")}
+  //   }
+  //   ).catch(console.log("error"))
+    
+
+  // };// !!!!!!!!!!!!!!!!!!
 
   retrieve = (item) => {
     
@@ -132,6 +155,14 @@ class App extends React.Component {
     this.setState({ selectedTabValue : selectedTabValue });
   };
 
+  handleAvatarClick = () => {
+    this.setState({ isModalOpen: true });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ isModalOpen: false });
+  };
+
   render() {
     // console.log("searchResultForUpdate:", this.state.searchResultForUpdate);
     var BookItems = (this.state.items.length > 0 &&( // 리스트: 기존 코드
@@ -144,7 +175,11 @@ class App extends React.Component {
       </Paper>
     )
     )
-
+    var userAvatar = (
+      <Stack direction="row" spacing={2}>
+      <Avatar sx={{ bgcolor: deepOrange[500] }}>K</Avatar>
+    </Stack>
+    )
     
     // navigationBar추가
     var navigationBar = (
@@ -155,6 +190,11 @@ class App extends React.Component {
               <Typography variant="h6">도서 관리</Typography>
             </Grid>
             <Grid>
+              <Stack direction="row" spacing={2}>
+                <Avatar sx={{ bgcolor: deepOrange[500] }} onClick={this.handleAvatarClick}>K</Avatar>
+              </Stack>
+            </Grid>
+            <Grid>
               <Button color="inherit" onClick={signout}>
                 로그아웃
               </Button>
@@ -163,6 +203,7 @@ class App extends React.Component {
         </Toolbar>
       </AppBar>
     )
+    
 
     var addBook = (<Container id="1" maxWidth="md">
           <AddBook />
@@ -226,11 +267,20 @@ class App extends React.Component {
         <BookUpdate retrieveForUpdate={this.retrieveForUpdate} searchResultForUpdate={this.state.searchResultForUpdate} update={this.update} />
         </Container>
     )
+    const userId = this.state.items.userId;
 
     
     return (
       <div className="App">
         {navigationBar}{/**내비게이션 바 렌더링 */}
+        <Modal open={this.state.isModalOpen} onClose={this.handleCloseModal}>
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+            <div  style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "200px" }}>
+              <Button color="inherit" onClick={signout}>로그아웃</Button>
+              <Typography variant="h6"></Typography>
+            </div>  
+          </div>
+        </Modal>
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
           <Tabs centered onChange={this.tabsChanged}>
             <Tab value = {1} label="Add" />
@@ -244,6 +294,7 @@ class App extends React.Component {
         {this.state.selectedTabValue === 3 && bookretrieve}
         {this.state.selectedTabValue === 4 && bookupdate}
         {booktable}{/**테이블 */}
+        
         
       </div>
     );
